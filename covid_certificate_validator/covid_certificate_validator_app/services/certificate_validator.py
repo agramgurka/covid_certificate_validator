@@ -17,8 +17,12 @@ logger.addHandler(handler)
 
 START_TIME = 0
 
+
 class FormatsConverter:
     """class implements formats conversions"""
+
+    # from this dpi value opencv can detect qrcode correctly
+    DPI = 300
 
     @staticmethod
     def get_png(file):
@@ -34,6 +38,8 @@ class FormatsConverter:
             logger.debug(f"start converting in {time.time() - START_TIME}")
             FormatsConverter.convert_pdf_to_png(file, file_png)
             logger.debug(f"finish converting in {time.time() - START_TIME}")
+        # elif check for another extension:
+        #     FormatsConverter.convert_another_extension_to_png
         else:
             logger.exception("incorrect file extension, not possible to convert to png")
             raise Exception
@@ -46,11 +52,13 @@ class FormatsConverter:
         try:
             doc = fitz.Document(pdf_path)
             page = doc.load_page(0)
-            picture = page.get_pixmap(dpi=300)
+            picture = page.get_pixmap(dpi=FormatsConverter.DPI)
             picture.save(png_path)
         except Exception:
             logger.exception("it's not possible to convert file to png")
             raise
+
+    # def convert_another_extension_to_png
 
 
 class QRCodeDecoder:
@@ -105,6 +113,8 @@ class ValidationFormHandler:
         logger.debug(f"finish file storage initialization in {time.time() - START_TIME}")
 
     def get_response(self):
+        """ returns dictionary representing information about a covid certificate from api """
+
         logger.debug(f"start decoding in {time.time() - START_TIME}")
         decoded_url = QRCodeDecoder.decode(self.file)
         logger.debug(f"finish decoding in {time.time() - START_TIME}")
@@ -123,6 +133,8 @@ class ValidationFormHandler:
             raise Exception
 
     def delete_temporary_files(self):
+        """deletes temporary files from the storage """
+
         for file in self.fss.listdir(self.fss.location)[1]:
             self.fss.delete(file)
 

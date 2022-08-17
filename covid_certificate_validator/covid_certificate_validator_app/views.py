@@ -25,12 +25,12 @@ START_TIME = 0
 class CertificateUploadView(View):
     form_template = "validator_input_form.html"
 
-    def get(self, request):
+    async def get(self, request):
         form = CertificateUploadForm()
         context = {"form": form}
         return render(request, CertificateUploadView.form_template, context)
 
-    def post(self, request):
+    async def post(self, request):
         start_time = time.time()
         logger.debug("processing post request")
         form = CertificateUploadForm(request.POST, request.FILES)
@@ -42,13 +42,12 @@ class CertificateUploadView(View):
                 upload = request.FILES["uploaded_file"]
                 validator = ValidationFormHandler(fss, upload)
                 response = validator.get_response()
-                context = {"response": response}
                 logger.debug(f"validation is successfully completed in {time.time() - start_time}")
-                return JsonResponse(response)
+                return JsonResponse(response, status=200)
             except Exception as e:
-                exception_json = {"VALIDATION ERROR: ": "LOOK TROUGH THE LOG"}
+                response = {"VALIDATION ERROR: ": "LOOK TROUGH THE LOG"}
                 logger.debug(f"validation is completed with error in {time.time() - start_time}")
-                return JsonResponse(exception_json)
+                return JsonResponse(response, status=400)
         else:
             context = {"form": form}
             logger.debug(f"validation is not possible due to form validity, finished in {time.time() - start_time}")

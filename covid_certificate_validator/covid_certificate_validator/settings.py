@@ -123,4 +123,5 @@ STATIC_ROOT = BASE_DIR / 'covid_certificate_validator_app/static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
